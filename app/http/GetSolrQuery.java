@@ -74,10 +74,10 @@ public class GetSolrQuery {
                     }
                     EntityUtils.consume(entity);*/
                 } catch (IllegalStateException e) {
-    				// TODO Auto-generated catch block
+    				
     				e.printStackTrace();
     			} catch (IOException e) {
-    				// TODO Auto-generated catch block
+    				
     				e.printStackTrace();
     			}finally {
                     //in.close();
@@ -89,7 +89,6 @@ public class GetSolrQuery {
         		try {
         			node = mapper.readTree(json);
         		} catch (IOException e) {
-        			// TODO Auto-generated catch block
         			e.printStackTrace();
         		}
             	
@@ -102,7 +101,6 @@ public class GetSolrQuery {
             		try {
 						quote = URLEncoder.encode("\"", "UTF-8");
 					} catch (UnsupportedEncodingException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
             		this.solr_query.append(String.format("&fq=point:%sIsWithin(%s)%sdistErrPct=0%s", quote, polygon_string, "%20", quote));

@@ -87,6 +87,11 @@ public class Application extends Controller {
     	DynamicForm formData = Form.form().bindFromRequest();
     	
     	FacetsWithCategories field_facet_for_query = new FacetsWithCategories();
+    	
+    	//Searching for the index of "[" is done here, because the way the views are set up
+    	//The scala will add a number to each category so as to map
+    	//The same category to more than 1 facet
+    	//When creating the query, however, this number is not needed.
     	for (String category : formData.data().keySet()){
     		if (category.contains("[")) {
     			int index = category.indexOf("[");
