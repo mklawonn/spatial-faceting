@@ -33,6 +33,25 @@ public class Application extends Controller {
     public static Result index() {
         return ok(backup.render("Your new application is ready."));
     }
+    
+    public static void getFacets(JsonHandler jh){
+    	//Get the facets
+        try {
+            if (jh.getFieldCountJson()) {
+                for (String key : jh.categories_and_facets.keySet()) {
+                    for (String facet : jh.categories_and_facets.get(key)){
+                        //HashMap<String, String> temp_map = new HashMap<String, String>();
+                        //temp_map.put(facet, jh.categories_facets_and_counts.get(key).get(facet));
+                        if (facet.equals("null")) {field_facets.addFacet(key, "missing"); continue;}
+                        field_facets.addFacet(key, facet);
+                    }
+                }
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
     public static Result test() {
     	Form<FacetFormData> formData = Form.form(FacetFormData.class).fill(facet_form);
@@ -53,23 +72,7 @@ public class Application extends Controller {
         
         
         //Get the facets
-        try {
-            if (jh.getFieldCountJson()) {
-                for (String key : jh.categories_and_facets.keySet()) {
-                    for (String facet : jh.categories_and_facets.get(key)){
-                        //HashMap<String, String> temp_map = new HashMap<String, String>();
-                        //temp_map.put(facet, jh.categories_facets_and_counts.get(key).get(facet));
-                        if (facet.equals("null")) {field_facets.addFacet(key, "missing"); continue;}
-                        field_facets.addFacet(key, facet);
-                    }
-                }
-            }
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-    
-        
+        getFacets(jh);
   
         return ok(index.render(formData, field_facets, query_facets,
                     range_facets, pivot_facets, cluster_facets, 
@@ -77,23 +80,12 @@ public class Application extends Controller {
     }
 
     public static Result postIndex() {
-        //TODO
-        //Read facets from form
-        //Generate Query
-        //Get results using http.GetSolrQuery, stored in a models.QueryResults
-        //Render results in list using index with the query_results variable set
+        
     	JsonHandler jh = new JsonHandler();
     	String named_geographic_location = new String();
     	String spatial_predicate = "within";
-    	//Form<FacetFormData> formData = Form.form(FacetFormData.class).bindFromRequest();
     	DynamicForm formData = Form.form().bindFromRequest();
-    	//FacetFormData fd = formData.get();
-    	//System.out.println(formData.data().keySet());
-    	//System.out.println(formData.data().values());
-    	//System.out.println(field_facets.facets.keySet());
-    	for (String category : field_facets.facets.keySet()){
-    		System.out.println(category);
-    	}
+    	
     	FacetsWithCategories field_facet_for_query = new FacetsWithCategories();
     	for (String category : formData.data().keySet()){
     		if (category.contains("[")) {
@@ -114,25 +106,10 @@ public class Application extends Controller {
 		} catch (IllegalStateException | IOException e1) {
 			e1.printStackTrace();
 		}
-        //Store the results in a models.QueryResults
         QueryResults query_results = new QueryResults(query_json);
     	
-      //Get the facets
-        try {
-            if (jh.getFieldCountJson()) {
-                for (String key : jh.categories_and_facets.keySet()) {
-                    for (String facet : jh.categories_and_facets.get(key)){
-                        //HashMap<String, String> temp_map = new HashMap<String, String>();
-                        //temp_map.put(facet, jh.categories_facets_and_counts.get(key).get(facet));
-                        if (facet.equals("null")) {field_facets.addFacet(key, "missing"); continue;}
-                        field_facets.addFacet(key, facet);
-                    }
-                }
-            }
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
+        //Get the facets
+        getFacets(jh);
         
         //return ok("cool");
         Form<FacetFormData> fd = Form.form(FacetFormData.class).fill(facet_form);
