@@ -26,18 +26,45 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class GetSolrQuery {
 
     public StringBuffer solr_query = new StringBuffer();
-    public String url_base = "http://jeffersontest.tw.rpi.edu/solr/datasets/browse?wt=json";
-
+    public String dataset_collection_url_base = "http://jeffersontest.tw.rpi.edu/solr/datasets/browse?wt=json";
+    public String lidarsonar_collection_url_base = "http://jeffersontest.tw.rpi.edu/solr/lidarsonar/select?wt=json";
+    
+    
     public GetSolrQuery () {} 
 
     public GetSolrQuery (Query query) {
-    	this.solr_query.append(url_base);
+    	this.solr_query.append(dataset_collection_url_base);
         this.solr_query.append("&q=*:*");
-        //System.out.println(query.field_facets.facets.keySet());
         
-        //Check for geospatial component
-        if (query.named_geographic_location != null){
-        	if (query.named_geographic_location.length() > 0){
+        String quote = new String();
+		try {
+			quote = URLEncoder.encode("\"", "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+        
+        
+        for (String field_facet_category : query.field_facets.facets.keySet()){
+            for (String field_facet : query.field_facets.facets.get(field_facet_category).keySet()){
+                this.solr_query.append(String.format("&fq=%s:%s%s%s", field_facet_category.replace(" ", "%20"), quote,
+                		field_facet.replace(" ", "%20"), quote));
+            }
+        }
+        
+        System.out.println("Final Solr Query");
+        System.out.println(this.solr_query.toString());
+    }
+
+    
+    //Preconditions: The GetSolrQuery object has been initialized by a Query object
+    //Inputs: The named location and the predicate associated with it.
+    //Output: Returns this object to allow for a builder design pattern to be applied.
+    //		  Currently does not handle http errors (e.g 404) very well. Need to fix.
+    //		  Especially to handle permission denied responses.
+    //Postconditions: The member string solr_query is modified to contain the spatial filters.
+    public GetSolrQuery addSpatialComponent(String named_geographic_location, String spatial_predicate) {
+    	if (named_geographic_location != null){
+        	if (named_geographic_location.length() > 0){
             	//Get the polygon associated with the name
             	StringBuffer spatial_query = new StringBuffer();
             	String json = new String();
@@ -45,7 +72,7 @@ public class GetSolrQuery {
             	try {
             		spatial_query.append("http://jeffersontest.tw.rpi.edu/solr/wikimapia/select?q=location_name");
             		spatial_query.append(URLEncoder.encode(":\"", "UTF-8"));
-            		spatial_query.append(URLEncoder.encode(query.named_geographic_location, "UTF-8"));
+            		spatial_query.append(URLEncoder.encode(named_geographic_location, "UTF-8"));
             		spatial_query.append(URLEncoder.encode("\"", "UTF-8"));
             		spatial_query.append("&wt=json");
             		//System.out.println(spatial_query.toString().charAt(72));
@@ -56,33 +83,21 @@ public class GetSolrQuery {
             	try
                 {
                 	HttpClient client = new DefaultHttpClient();
-                	String encoded_query = URLEncoder.encode(spatial_query.toString(), "UTF-8");
+                	
                 	System.out.println(spatial_query.toString());
                 	HttpGet request = new HttpGet(spatial_query.toString().replace(" ", "%20"));
                 	HttpResponse response = client.execute(request);
           
-                    //in = new Scanner(response.getEntity().getContent());
                     StringWriter writer = new StringWriter();
                     IOUtils.copy(response.getEntity().getContent(), writer, "utf-8");
-                    //System.out.println(writer.toString());
-                    //return writer.toString();
+
                     json = writer.toString();
-                    //return IOUtils.toString(entity.getContent());
-                    /*while (in.hasNext())
-                    {
-                        System.out.println(in.next());
-                    }
-                    EntityUtils.consume(entity);*/
+                    
                 } catch (IllegalStateException e) {
-    				
     				e.printStackTrace();
     			} catch (IOException e) {
-    				
     				e.printStackTrace();
-    			}finally {
-                    //in.close();
-                    //request.close();
-                }
+    			}
             	
             	ObjectMapper mapper = new ObjectMapper();
             	JsonNode node = null;
@@ -96,6 +111,7 @@ public class GetSolrQuery {
             	Iterator<JsonNode> doc_iterator = documents.iterator();
             	while (doc_iterator.hasNext()){
             		JsonNode doc = doc_iterator.next();
+            		//For the SOLR query to work, the commas must be surrounded by spaces
             		polygon_string = doc.get("polygon_string").asText().replace(",", " , ");
             		String quote = new String();
             		try {
@@ -104,41 +120,21 @@ public class GetSolrQuery {
 						e.printStackTrace();
 					}
             		this.solr_query.append(String.format("&fq=point:%sIsWithin(%s)%sdistErrPct=0%s", quote, polygon_string, "%20", quote));
-            		/*
-            		try {
-						this.solr_query.append(URLEncoder.encode(String.format("&fq=point:\"IsWithin(%s)%sdistErrPct=0\"", polygon_string, "%20"), "UTF-8"));
-					} catch (UnsupportedEncodingException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}*/
-            		//System.out.println(doc.get("polygon_string"));
             	}
-            	//System.out.println(documents.asText());
-            	//Add the filter to the query
             }
-            
-            for (String field_facet_category : query.field_facets.facets.keySet()){
-                for (String field_facet : query.field_facets.facets.get(field_facet_category).keySet()){
-                    this.solr_query.append(String.format("&fq=%s:%s", field_facet_category.replace(" ", "%20"), 
-                    		field_facet.replace(" ", "%20")));
-                }
-            }
-        }
-
-        System.out.println("Final Solr Query");
-        System.out.println(this.solr_query.toString());
-        //this.solr_query.append("}");
+    	}
+    	return this;
     }
-
-    //Should return JSON
+    
+    //Preconditions: The GetSolrQuery object has been initialized by a Query object
+    //Inputs: None. Executes query based on the member string solr_query.
+    //Output: Returns JSON in the form of a string. Currently does not handle http errors
+    //		  very gracefully. Need to change this.
+    //Postconditions: None
     public String executeQuery() throws IllegalStateException, IOException{
     	CloseableHttpClient httpClient = HttpClients.createDefault();
-        HttpGet get = new HttpGet(url_base);
-        //List<NameValuePair> params = new ArrayList<>();
-        //params.add(new BasicNameValuePair("task", "savemodel"));
-        //params.add(new BasicNameValuePair("code", solr_query.toString()));
-        //StringEntity postingString = new StringEntity(solr_query.toString());
-        //CloseableHttpResponse response = null;
+        HttpGet get = new HttpGet(dataset_collection_url_base);
+        
         Scanner in = null;
         try
         {
@@ -146,17 +142,11 @@ public class GetSolrQuery {
         	HttpGet request = new HttpGet(solr_query.toString().replace(" ", "%20"));
         	HttpResponse response = client.execute(request);
   
-            //in = new Scanner(response.getEntity().getContent());
             StringWriter writer = new StringWriter();
             IOUtils.copy(response.getEntity().getContent(), writer, "utf-8");
-            //System.out.println(writer.toString());
+            
             return writer.toString();
-            //return IOUtils.toString(entity.getContent());
-            /*while (in.hasNext())
-            {
-                System.out.println(in.next());
-            }
-            EntityUtils.consume(entity);*/
+            
         } finally
         {
             //in.close();
