@@ -27,7 +27,7 @@ public class GetSolrQuery {
 
     public StringBuffer solr_query = new StringBuffer();
     public String dataset_collection_url_base = "http://jeffersontest.tw.rpi.edu/solr/datasets/browse?wt=json";
-    public String lidarsonar_collection_url_base = "http://jeffersontest.tw.rpi.edu/solr/lidarsonar/select?wt=json";
+    public String lidarsonar_collection_url_base = "http://matt:rophestorbeleara@jeffersontest.tw.rpi.edu/solr/lidarsonar/select?wt=json";
     
     
     public GetSolrQuery () {} 
@@ -51,8 +51,8 @@ public class GetSolrQuery {
             }
         }
         
-        System.out.println("Final Solr Query");
-        System.out.println(this.solr_query.toString());
+        //System.out.println("Final Solr Query");
+        //System.out.println(this.solr_query.toString());
     }
 
     
@@ -63,6 +63,8 @@ public class GetSolrQuery {
     //		  Especially to handle permission denied responses.
     //Postconditions: The member string solr_query is modified to contain the spatial filters.
     public GetSolrQuery addSpatialComponent(String named_geographic_location, String spatial_predicate) {
+    	//Right now (4-14-15) the lidarsonar collection is the only collection with associate lats and longs
+    	//In other words, this must be the collection queried to use the spatial faceting
     	solr_query = new StringBuffer(solr_query.toString().replace(dataset_collection_url_base, 
     								  lidarsonar_collection_url_base));
     	if (named_geographic_location != null){
@@ -125,6 +127,8 @@ public class GetSolrQuery {
             	}
             }
     	}
+    	System.out.println("The spatial query:");
+    	System.out.println(this.solr_query.toString());
     	return this;
     }
     

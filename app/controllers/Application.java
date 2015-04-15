@@ -104,7 +104,7 @@ public class Application extends Controller {
     	Query query = new Query(named_geographic_location, spatial_predicate, field_facet_for_query, query_facets,
     						    pivot_facets, range_facets, cluster_facets);
     	
-    	GetSolrQuery query_submit = new GetSolrQuery(query);
+    	GetSolrQuery query_submit = new GetSolrQuery(query).addSpatialComponent(named_geographic_location, spatial_predicate);
         String query_json = null;
         try {
 			query_json = query_submit.executeQuery();

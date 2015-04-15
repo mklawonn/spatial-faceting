@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TreeMap;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,35 +35,21 @@ public class QueryResults {
 		Iterator<JsonNode> doc_iterator = documents.iterator();
 		while (doc_iterator.hasNext()){
 			JsonNode doc = doc_iterator.next();
-			String id = doc.get("id").asText();
-			String started_at = null;
-			try {
-				started_at = doc.get("started_at").asText();
-			} catch (Exception e) {
-				started_at = "";
+			TreeMap<String, String> fields = new TreeMap<String, String>();
+			
+			Iterator<String> docFields = doc.fieldNames();
+			while (docFields.hasNext()){
+				String docField = docFields.next();
+				fields.put(docField, doc.get(docField).asText());
+				System.out.println(docField);
 			}
-			String ended_at = null;
-			try {
-				ended_at = doc.get("ended_at").asText();;
-			} catch (Exception e) {
-				ended_at = "";
-			}
-			String observation = doc.get("observation").asText();
-			String deployment = doc.get("deployment").asText();
-			String platform_label = null;
-			try {
-				doc.get("platform_label").asText();
-			} catch (Exception e) {
-				platform_label = "";
-			}
-			String secured = doc.get("secured").asText();
-			String nr_measurements = doc.get("nr_measurements").asText();
+			
 			List<JsonNode> characteristic = doc.findValues("characteristic");
 			ArrayList<String> characteristics = new ArrayList<String>();
 			for (JsonNode c : characteristic){
 				characteristics.add(c.asText());
 			}
-			the_docs.add(new Document(id, started_at, ended_at, observation, deployment, platform_label, secured, nr_measurements, characteristics));
+			the_docs.add(new Document(fields, characteristics));
 		}
 		//System.out.println(the_docs.size());
     }

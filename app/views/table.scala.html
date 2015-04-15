@@ -11,18 +11,13 @@
 
             <tbody>
                 @for(document <- documentMap.the_docs) {
-                    <tr>
+                <tr>
                         <td>
-                            <p>ID: @document.id</p>
-                            <p>Started: @document.started_at</p>
-                            <p>Ended: @document.ended_at</p>
-                            <p>Observation: @document.observation</p>
-                            <p>Deployment: @document.deployment</p>
-                            <p>Platform Label: @document.platform_label</p>
-                            <p>Secured: @document.secured</p>
-                            <p>Number of Measurements: @document.nr_measurements</p>
-                        </td>
-                    </tr>
+                	@for((field, value) <- document.fields){
+                            <p>@field: @value</p>
+                    }
+                    	</td>
+                </tr>
                 }
             </tbody>
 
