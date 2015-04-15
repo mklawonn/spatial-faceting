@@ -39,6 +39,9 @@ public class QueryResults {
 			Iterator<String> docFields = doc.fieldNames();
 			while (docFields.hasNext()){
 				String docField = docFields.next();
+				if (docField.equals("characteristic")){
+					continue;
+				}
 				fields.put(docField, doc.get(docField).asText());
 				//System.out.println(docField);
 			}
@@ -46,7 +49,15 @@ public class QueryResults {
 			List<JsonNode> characteristic = doc.findValues("characteristic");
 			ArrayList<String> characteristics = new ArrayList<String>();
 			for (JsonNode c : characteristic){
-				characteristics.add(c.asText());
+				Iterator<String> chars = c.fieldNames();
+				while (chars.hasNext()){
+					//TODO Rename this
+					String the_thing = chars.next();
+					//characteristics.add(the_thing);
+					//System.out.println(the_thing);
+				}
+				System.out.println(c.toString());
+				characteristics.add(c.toString());
 			}
 			the_docs.add(new Document(fields, characteristics));
 		}

@@ -13,9 +13,13 @@
                 @for(document <- documentMap.the_docs) {
                 <tr>
                         <td>
-                	@for((field, value) <- document.fields){
+                        @for(characteristic <- document.characteristic){
+                				<p>characteristic: @characteristic<p>
+                		}
+                        
+                		@for((field, value) <- document.fields){
                             <p>@field: @value</p>
-                    }
+                    	}
                     	</td>
                 </tr>
                 }

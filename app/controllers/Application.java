@@ -76,7 +76,7 @@ public class Application extends Controller {
   
         return ok(index.render(formData, field_facets, query_facets,
                     range_facets, pivot_facets, cluster_facets, 
-                    formData.get().named_geographic_location, formData.get().spatial_predicate, query_results, "*:*"));
+                    formData.get().named_geographic_location, formData.get().spatial_predicate, query_results, "All Documents"));
     }
 
     public static Result postIndex() {
