@@ -9,7 +9,7 @@
         <label class="checkbox">
           <input
             type="checkbox"
-            name="@field.name"
+            name="@(field.name + "[]")"
             id="@checkboxName"
             value="@checkboxName"
             @if(isChecked) {checked}>

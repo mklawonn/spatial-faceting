@@ -63,6 +63,8 @@ public class GetSolrQuery {
     //		  Especially to handle permission denied responses.
     //Postconditions: The member string solr_query is modified to contain the spatial filters.
     public GetSolrQuery addSpatialComponent(String named_geographic_location, String spatial_predicate) {
+    	solr_query = new StringBuffer(solr_query.toString().replace(dataset_collection_url_base, 
+    								  lidarsonar_collection_url_base));
     	if (named_geographic_location != null){
         	if (named_geographic_location.length() > 0){
             	//Get the polygon associated with the name
