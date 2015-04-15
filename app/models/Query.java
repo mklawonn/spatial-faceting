@@ -1,18 +1,5 @@
 package models;
 
-import play.*;
-import play.mvc.*;
-
-import views.html.*;
-
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
-
-import models.FacetsWithCategories;
-
 import views.formdata.FacetFormData;
 
 public class Query {

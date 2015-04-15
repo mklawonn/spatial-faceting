@@ -26,11 +26,10 @@ public class QueryResults {
 		try {
 			node = mapper.readTree(json);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
-		//TODO Get the document list from the json
-		//TODO Then add to a list
+
 		JsonNode documents = node.get("response").get("docs");
 		Iterator<JsonNode> doc_iterator = documents.iterator();
 		while (doc_iterator.hasNext()){
@@ -41,7 +40,7 @@ public class QueryResults {
 			while (docFields.hasNext()){
 				String docField = docFields.next();
 				fields.put(docField, doc.get(docField).asText());
-				System.out.println(docField);
+				//System.out.println(docField);
 			}
 			
 			List<JsonNode> characteristic = doc.findValues("characteristic");
