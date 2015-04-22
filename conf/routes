@@ -3,7 +3,7 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.index()
+GET     /                           controllers.Application.test()
 GET     /test                       controllers.Application.test()
 POST    /                           controllers.Application.postIndex()
 
