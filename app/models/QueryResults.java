@@ -26,41 +26,48 @@ public class QueryResults {
 		try {
 			node = mapper.readTree(json);
 		} catch (IOException e) {
-			
 			e.printStackTrace();
 		}
 
-		JsonNode documents = node.get("response").get("docs");
-		Iterator<JsonNode> doc_iterator = documents.iterator();
-		while (doc_iterator.hasNext()){
-			JsonNode doc = doc_iterator.next();
-			TreeMap<String, String> fields = new TreeMap<String, String>();
-			
-			Iterator<String> docFields = doc.fieldNames();
-			while (docFields.hasNext()){
-				String docField = docFields.next();
-				if (docField.equals("characteristic")){
-					continue;
+		//JsonNode documents = node.get("response").get("docs");
+		
+		JsonNode documents;
+		
+		try {
+			documents = node.get("response").get("docs");
+			Iterator<JsonNode> doc_iterator = documents.iterator();
+			while (doc_iterator.hasNext()){
+				JsonNode doc = doc_iterator.next();
+				TreeMap<String, String> fields = new TreeMap<String, String>();
+				
+				Iterator<String> docFields = doc.fieldNames();
+				while (docFields.hasNext()){
+					String docField = docFields.next();
+					if (docField.equals("characteristic")){
+						continue;
+					}
+					fields.put(docField, doc.get(docField).asText());
+					//System.out.println(docField);
 				}
-				fields.put(docField, doc.get(docField).asText());
-				//System.out.println(docField);
-			}
-			
-			List<JsonNode> characteristic = doc.findValues("characteristic");
-			ArrayList<String> characteristics = new ArrayList<String>();
-			for (JsonNode c : characteristic){
-				Iterator<String> chars = c.fieldNames();
-				while (chars.hasNext()){
-					//TODO Rename this
-					String the_thing = chars.next();
-					//characteristics.add(the_thing);
-					//System.out.println(the_thing);
+				
+				List<JsonNode> characteristic = doc.findValues("characteristic");
+				ArrayList<String> characteristics = new ArrayList<String>();
+				for (JsonNode c : characteristic){
+					Iterator<String> chars = c.fieldNames();
+					while (chars.hasNext()){
+						//TODO Rename this
+						String the_thing = chars.next();
+						//characteristics.add(the_thing);
+						//System.out.println(the_thing);
+					}
+					System.out.println(c.toString());
+					characteristics.add(c.toString());
 				}
-				System.out.println(c.toString());
-				characteristics.add(c.toString());
+				the_docs.add(new Document(fields, characteristics));
 			}
-			the_docs.add(new Document(fields, characteristics));
+			//System.out.println(the_docs.size());
+		} catch (Exception e){
+			e.printStackTrace();
 		}
-		//System.out.println(the_docs.size());
     }
 }
