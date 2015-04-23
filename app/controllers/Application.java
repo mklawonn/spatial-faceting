@@ -29,10 +29,6 @@ public class Application extends Controller {
     public static Map<String, Boolean> named_location = new HashMap<String, Boolean>();
     public static Map<String, Boolean> spatial_predicate = new HashMap<String, Boolean>();
     public static QueryResults query_results = new QueryResults();
-
-    public static Result index() {
-        return ok(backup.render("Your new application is ready."));
-    }
     
     public static void getFacets(JsonHandler jh){
     	//Get the facets
@@ -53,7 +49,7 @@ public class Application extends Controller {
         }
     }
 
-    public static Result test() {
+    public static Result index() {
     	Form<FacetFormData> formData = Form.form(FacetFormData.class).fill(facet_form);
         JsonHandler jh = new JsonHandler();
         //ArrayList<String> names = new ArrayList<String>();
@@ -88,7 +84,7 @@ public class Application extends Controller {
     	
     	FacetsWithCategories field_facet_for_query = new FacetsWithCategories();
     	
-    	//Searching for the index of "[" is done here, because the way the views are set up
+    	//Searching for the index of "[" is done here, because of the way the views are set up
     	//The scala will add a number to each category so as to map
     	//The same category to more than 1 facet
     	//When creating the query, however, this number is not needed.

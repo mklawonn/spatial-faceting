@@ -33,6 +33,7 @@ public class QueryResults {
 		
 		JsonNode documents;
 		
+		//Surrounded with try catch to avoid null result set crashing the app
 		try {
 			documents = node.get("response").get("docs");
 			Iterator<JsonNode> doc_iterator = documents.iterator();
@@ -56,6 +57,7 @@ public class QueryResults {
 					Iterator<String> chars = c.fieldNames();
 					while (chars.hasNext()){
 						//TODO Rename this
+						//TODO Figure out why I did this. Can't remember why it's here
 						String the_thing = chars.next();
 						//characteristics.add(the_thing);
 						//System.out.println(the_thing);

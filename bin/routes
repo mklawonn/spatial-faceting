@@ -3,8 +3,8 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.test()
-GET     /test                       controllers.Application.test()
+GET     /                           controllers.Application.index()
+#GET     /test                       controllers.Application.test()
 POST    /                           controllers.Application.postIndex()
 
 # Map static resources from the /public folder to the /assets URL path
