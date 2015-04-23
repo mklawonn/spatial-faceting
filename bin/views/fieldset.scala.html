@@ -3,9 +3,7 @@
     queryFacets: models.FacetsWithCategories,
     rangeFacets: models.FacetsWithCategories,
     pivotFacets: models.FacetsWithCategories,
-    clusterFacets: models.FacetsWithCategories,
-    namedLocation: String,
-    spatialPredicates: String)
+    clusterFacets: models.FacetsWithCategories)
 
 
 
@@ -15,12 +13,6 @@
     <div id="legend">
         <legend>Facets<legend>
     </div>
-
-    <h3>Spatial Facets</h3>
-    @text(facetForm("named_geographic_location"),
-          label = "Named Place",
-          placeholder = "Enter a named place",
-          help = "Type the name of a place you'd like to use in the search")
 
     <div> 
     <h3>Field Facets</h3>

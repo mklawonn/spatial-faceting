@@ -15,10 +15,10 @@ import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import views.formdata.FacetFormData;
-import views.html.backup;
-import views.html.index;
+import views.html.spatial_faceting;
 
-public class Application extends Controller {
+
+public class Spatial extends Controller {
 
     public static FacetFormData facet_form = new FacetFormData();
     public static FacetsWithCategories field_facets = new FacetsWithCategories();
@@ -26,6 +26,8 @@ public class Application extends Controller {
     public static FacetsWithCategories pivot_facets = new FacetsWithCategories();
     public static FacetsWithCategories range_facets = new FacetsWithCategories();
     public static FacetsWithCategories cluster_facets = new FacetsWithCategories();
+    public static Map<String, Boolean> named_location = new HashMap<String, Boolean>();
+    public static Map<String, Boolean> spatial_predicate = new HashMap<String, Boolean>();
     public static QueryResults query_results = new QueryResults();
     
     public static void getFacets(JsonHandler jh){
@@ -68,9 +70,9 @@ public class Application extends Controller {
         //Get the facets
         getFacets(jh);
   
-        return ok(index.render(formData, field_facets, query_facets,
+        return ok(spatial_faceting.render(formData, field_facets, query_facets,
                     range_facets, pivot_facets, cluster_facets, 
-                    query_results, "All Documents"));
+                    formData.get().named_geographic_location, formData.get().spatial_predicate, query_results, "All Documents"));
     }
 
     public static Result postIndex() {
@@ -98,7 +100,7 @@ public class Application extends Controller {
     	Query query = new Query(named_geographic_location, spatial_predicate, field_facet_for_query, query_facets,
     						    pivot_facets, range_facets, cluster_facets);
     	
-    	GetSolrQuery query_submit = new GetSolrQuery(query);
+    	GetSolrQuery query_submit = new GetSolrQuery(query).addSpatialComponent(named_geographic_location, spatial_predicate);
     	String final_query = query_submit.solr_query.toString();
         String query_json = null;
         try {
@@ -113,9 +115,9 @@ public class Application extends Controller {
         
         //return ok("cool");
         Form<FacetFormData> fd = Form.form(FacetFormData.class).fill(facet_form);
-        return ok(index.render(fd, field_facets, query_facets,
+        return ok(spatial_faceting.render(fd, field_facets, query_facets,
                 range_facets, pivot_facets, cluster_facets, 
-                query_results, final_query));
+                named_geographic_location, spatial_predicate, query_results, final_query));
     }
 
 }
