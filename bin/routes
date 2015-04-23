@@ -4,8 +4,9 @@
 
 # Home page
 GET     /                           controllers.Application.index()
-#GET     /test                       controllers.Application.test()
 POST    /                           controllers.Application.postIndex()
+GET		/spatial					controllers.Spatial.index()
+POST	/spatial					controllers.Spatial.postIndex()
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
