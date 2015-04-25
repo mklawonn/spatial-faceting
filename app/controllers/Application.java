@@ -4,8 +4,7 @@ import http.GetSolrQuery;
 import http.JsonHandler;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.TreeMap;
 
 import models.FacetsWithCategories;
 import models.Query;
@@ -15,7 +14,6 @@ import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import views.formdata.FacetFormData;
-import views.html.backup;
 import views.html.index;
 
 public class Application extends Controller {
@@ -28,6 +26,8 @@ public class Application extends Controller {
     public static FacetsWithCategories cluster_facets = new FacetsWithCategories();
     public static QueryResults query_results = new QueryResults();
     
+    
+    //Postconditions: field_facets will be modified if there are facets in the JsonHandler
     public static void getFacets(JsonHandler jh){
     	//Get the facets
         try {
@@ -55,22 +55,29 @@ public class Application extends Controller {
         //Get query using http.GetSolrQuery
         Query query = new Query();
         GetSolrQuery query_submit = new GetSolrQuery(query);
-        String query_json = null;
-        try {
-			query_json = query_submit.executeQuery();
-		} catch (IllegalStateException | IOException e1) {
-			e1.printStackTrace();
-		}
-        //Store the results in a models.QueryResults
-        QueryResults query_results = new QueryResults(query_json);
-        
-        
+        TreeMap<String, QueryResults> query_results_list = new TreeMap<String, QueryResults>();
+    	String final_query = null;
+    	
+    	for (String collection : query_submit.list_of_queries.keySet()){
+    		final_query = query_submit.list_of_queries.get(collection).toString();
+    		String query_json = null;
+            try {
+    			query_json = query_submit.executeQuery(collection);
+    		} catch (IllegalStateException | IOException e1) {
+    			e1.printStackTrace();
+    		}
+            QueryResults query_results = new QueryResults(query_json);
+            query_results_list.put(collection, query_results);
+    	}
+    	
         //Get the facets
         getFacets(jh);
-  
-        return ok(index.render(formData, field_facets, query_facets,
-                    range_facets, pivot_facets, cluster_facets, 
-                    query_results, "All Documents"));
+        
+        //return ok("cool");
+        Form<FacetFormData> fd = Form.form(FacetFormData.class).fill(facet_form);
+        return ok(index.render(fd, field_facets, query_facets,
+                range_facets, pivot_facets, cluster_facets, 
+                query_results_list, final_query));
     }
 
     public static Result postIndex() {
@@ -95,18 +102,28 @@ public class Application extends Controller {
     		}
     	}
     	
+    	//TODO Change Query constructor not to accept named_geographic_location and spatial_predicate as args
+    	//Don't need it since the addSpatialComponent function was created
     	Query query = new Query(named_geographic_location, spatial_predicate, field_facet_for_query, query_facets,
     						    pivot_facets, range_facets, cluster_facets);
     	
     	GetSolrQuery query_submit = new GetSolrQuery(query);
-    	String final_query = query_submit.solr_query.toString();
-        String query_json = null;
-        try {
-			query_json = query_submit.executeQuery();
-		} catch (IllegalStateException | IOException e1) {
-			e1.printStackTrace();
-		}
-        QueryResults query_results = new QueryResults(query_json);
+    	
+    	//TODO loop over all queries in query_submit.list_of_queries
+    	TreeMap<String, QueryResults> query_results_list = new TreeMap<String, QueryResults>();
+    	String final_query = null;
+    	
+    	for (String collection : query_submit.list_of_queries.keySet()){
+    		final_query = query_submit.list_of_queries.get(collection).toString();
+    		String query_json = null;
+            try {
+    			query_json = query_submit.executeQuery(collection);
+    		} catch (IllegalStateException | IOException e1) {
+    			e1.printStackTrace();
+    		}
+            QueryResults query_results = new QueryResults(query_json);
+            query_results_list.put(collection, query_results);
+    	}
     	
         //Get the facets
         getFacets(jh);
@@ -115,7 +132,7 @@ public class Application extends Controller {
         Form<FacetFormData> fd = Form.form(FacetFormData.class).fill(facet_form);
         return ok(index.render(fd, field_facets, query_facets,
                 range_facets, pivot_facets, cluster_facets, 
-                query_results, final_query));
+                query_results_list, final_query));
     }
 
 }
