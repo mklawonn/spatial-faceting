@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.Scanner;
 import java.util.TreeMap;
 
+
 import models.Query;
 
 import org.apache.commons.io.IOUtils;
@@ -27,8 +28,6 @@ public class GetSolrQuery {
 	public TreeMap<String, StringBuffer> list_of_queries = new TreeMap<String, StringBuffer>();
     public StringBuffer solr_query = new StringBuffer();
     public TreeMap<String, String> collection_urls = new TreeMap<String, String>();
-    public String dataset_collection_url_base = "http://jeffersontest.tw.rpi.edu/solr/datasets/select?wt=json";
-    public String lidarsonar_collection_url_base = "http://matt:rophestorbeleara@jeffersontest.tw.rpi.edu/solr/lidarsonar/select?wt=json";
     
     public GetSolrQuery () {} 
 
@@ -81,7 +80,9 @@ public class GetSolrQuery {
     	collection_urls.put("datasets", "http://jeffersontest.tw.rpi.edu/solr/datasets/select?wt=json");
     	collection_urls.put("metadata", "http://jeffersontest.tw.rpi.edu/solr/metadata/select?wt=json");
     	collection_urls.put("wikimapia", "http://jeffersontest.tw.rpi.edu/solr/wikimapia/select?wt=json");
-    	collection_urls.put("lidarsonar", "http://matt:rophestorbeleara@jeffersontest.tw.rpi.edu/solr/lidarsonar/select?wt=json");
+    	String lidarsonar = String.format("http://%s:%s@jeffersontest.tw.rpi.edu/solr/lidarsonar/select?wt=json", 
+    			                           play.mvc.Controller.session("username"), play.mvc.Controller.session("password"));
+    	collection_urls.put("lidarsonar", lidarsonar);
     }
     
     //Preconditions: The GetSolrQuery object has been initialized by a Query object

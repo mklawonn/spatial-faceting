@@ -46,6 +46,17 @@ public class Application extends Controller {
             e.printStackTrace();
         }
     }
+    
+    public static Result login(){
+    	DynamicForm formData = Form.form().bindFromRequest();
+    	String username = formData.data().get("username");
+    	String password = formData.data().get("password");
+    	
+    	session("username", username);
+    	session("password", password);
+    	    	
+    	return redirect("/");
+    }
 
     public static Result index() {
     	Form<FacetFormData> formData = Form.form(FacetFormData.class).fill(facet_form);
@@ -73,9 +84,16 @@ public class Application extends Controller {
         //Get the facets
         getFacets(jh);
         
+        String username;
+        if (session("username") == null){
+        	username = "You are not connected";
+        } else {
+        	username = String.format("Hello, %s", session("username"));
+        }
+        
         //return ok("cool");
         Form<FacetFormData> fd = Form.form(FacetFormData.class).fill(facet_form);
-        return ok(index.render(fd, field_facets, query_facets,
+        return ok(index.render(username, fd, field_facets, query_facets,
                 range_facets, pivot_facets, cluster_facets, 
                 query_results_list, final_query));
     }
@@ -128,9 +146,16 @@ public class Application extends Controller {
         //Get the facets
         getFacets(jh);
         
+        String username;
+        if (session("username") == null){
+        	username = "You are not connected";
+        } else {
+        	username = String.format("Hello, %s", session("username"));
+        }
+        
         //return ok("cool");
         Form<FacetFormData> fd = Form.form(FacetFormData.class).fill(facet_form);
-        return ok(index.render(fd, field_facets, query_facets,
+        return ok(index.render(username, fd, field_facets, query_facets,
                 range_facets, pivot_facets, cluster_facets, 
                 query_results_list, final_query));
     }
