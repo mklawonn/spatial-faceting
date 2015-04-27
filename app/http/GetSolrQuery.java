@@ -75,12 +75,21 @@ public class GetSolrQuery {
     public void addCollectionUrls(){
     	//TODO Replace this method with something that dynamically checks the SOLR database for all collections
     	//This will require a string formatting approach, and for a password to be asked for at the start of use (to access lidarsonar)
+    	/*
     	collection_urls.put("collection1", "http://jeffersontest.tw.rpi.edu/solr/collection1/select?wt=json");
     	collection_urls.put("collection2", "http://jeffersontest.tw.rpi.edu/solr/collection2/select?wt=json");
     	collection_urls.put("datasets", "http://jeffersontest.tw.rpi.edu/solr/datasets/select?wt=json");
     	collection_urls.put("metadata", "http://jeffersontest.tw.rpi.edu/solr/metadata/select?wt=json");
     	collection_urls.put("wikimapia", "http://jeffersontest.tw.rpi.edu/solr/wikimapia/select?wt=json");
     	String lidarsonar = String.format("http://%s:%s@jeffersontest.tw.rpi.edu/solr/lidarsonar/select?wt=json", 
+    			                           play.mvc.Controller.session("username"), play.mvc.Controller.session("password"));
+    	collection_urls.put("lidarsonar", lidarsonar);*/
+    	collection_urls.put("collection1", "http://localhost:8983/solr/collection1/select?wt=json");
+    	collection_urls.put("collection2", "http://localhost:8983/solr/collection2/select?wt=json");
+    	collection_urls.put("datasets", "http://localhost:8983/solr/datasets/select?wt=json");
+    	collection_urls.put("metadata", "http://localhost:8983/solr/metadata/select?wt=json");
+    	collection_urls.put("wikimapia", "http://localhost:8983/solr/wikimapia/select?wt=json");
+    	String lidarsonar = String.format("http://%s:%s@localhost:8983/solr/lidarsonar/select?wt=json", 
     			                           play.mvc.Controller.session("username"), play.mvc.Controller.session("password"));
     	collection_urls.put("lidarsonar", lidarsonar);
     }
