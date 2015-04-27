@@ -86,7 +86,7 @@ public class Application extends Controller {
         
         String username;
         if (session("username") == null){
-        	username = "You are not connected";
+        	username = "You are not logged in";
         } else {
         	username = String.format("Hello, %s", session("username"));
         }
@@ -148,7 +148,7 @@ public class Application extends Controller {
         
         String username;
         if (session("username") == null){
-        	username = "You are not connected";
+        	username = "You are not logged in";
         } else {
         	username = String.format("Hello, %s", session("username"));
         }
